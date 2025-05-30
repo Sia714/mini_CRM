@@ -1,0 +1,5 @@
+crm_frontend/node_modules/
+crm_backend/node_modules/
+
+crm_backend/.env
+crm_frontend/.env
