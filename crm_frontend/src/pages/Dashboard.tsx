@@ -4,6 +4,8 @@ import {
 } from "@mui/material";
 import AddNewCustomer from "../components/addNewCustomer";
 import AddNewOrder from "../components/addNewOrder";
+import SegmentCampaign from "../components/segmentCampaign";
+
 function Dashboard() {
 //   const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -20,7 +22,8 @@ function Dashboard() {
   "Automotive",
 ];
   return (
-    <Grid container direction="row" spacing={2}  sx={{
+    <>
+    {/* <Grid container direction="row" spacing={2}  sx={{
     justifyContent: "flex-start",
     alignItems: "flex-start",
   }}>
@@ -29,9 +32,12 @@ function Dashboard() {
     </Grid>
     <Grid size={{ xs: 12, md: 6 }}>
     <AddNewOrder categories={categories}/>
+    </Grid>
+    
+    </Grid> */}
+    <SegmentCampaign />
+    </>
 
-    </Grid>
-    </Grid>
   );
 }
 

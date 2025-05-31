@@ -10,6 +10,7 @@ const customerSchema = new mongoose.Schema(
     fullAddress: String,
     lastVisited: Date,
     totalSpent: Number,
+    visits: Number,
     totalOrders: Number,
     lastRating: Number,
     category: String,

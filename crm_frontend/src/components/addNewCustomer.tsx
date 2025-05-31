@@ -19,6 +19,7 @@ function AddNewCustomer({ categories }: { categories: string[] }) {
   const [email, setEmail] = useState("");
   const [isActive, setIsActive] = useState<boolean | null>(null);
   const [lastVisited, setLastVisited] = useState<string>(""); // store as yyyy-mm-dd string
+  const [visits, setVisits] = useState<number|null>(null);
   const [totalSpent, setTotalSpent] = useState<number|null>(null);
   const [totalOrders, setTotalOrders] = useState<number|null>(null);
   const [lastRating, setLastRating] = useState<number|null>(null);
@@ -42,6 +43,8 @@ function AddNewCustomer({ categories }: { categories: string[] }) {
     
     if(totalOrders){
       setTotalOrders(Math.floor(totalOrders))}
+        if(visits){
+      setVisits(Math.floor(visits))}
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -62,6 +65,7 @@ function AddNewCustomer({ categories }: { categories: string[] }) {
           email,
           fullAddress: address,
           lastVisited,  
+          visits,
           isActive,
           totalSpent,
           totalOrders,
@@ -81,6 +85,7 @@ function AddNewCustomer({ categories }: { categories: string[] }) {
       setGender("");
       setEmail("");
       setIsActive(null);
+      setVisits(null);
       setTotalSpent(null);
       setLastRating(null);
       setTotalOrders(null);
@@ -148,7 +153,15 @@ function AddNewCustomer({ categories }: { categories: string[] }) {
             </RadioGroup>
          
           
-          
+          <TextField
+            size="small"
+            label="Total Orders"
+            fullWidth
+            type="number"
+            InputProps={{ inputProps: { min: 0} }}
+            value={visits ?? ""}
+            onChange={(e) => setVisits(Number(e.target.value))}
+          />
             <TextField
               size="small"
               label="Last Visited"

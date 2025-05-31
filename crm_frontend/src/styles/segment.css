@@ -1,0 +1,76 @@
+*{
+    color: black;
+}
+h4{
+  color: #f0f0f0;
+}
+.container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+.input-box {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.boxes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 300px;
+}
+
+.box {
+  border: 1px solid #aaa;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.draggable-item {
+  background-color: #f0f0f0;
+  margin: 5px 0;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: grab;
+}
+
+.workspace {
+  flex-grow: 1;
+  border: 2px dashed #999;
+  padding: 20px;
+  background-color: #ffffff5b;
+  border-radius: 10px;
+  min-width: 400px;
+  min-height: 200px;
+}
+
+.table {
+  color:#fff;
+  flex-grow: 1;
+  border: 2px solid #999;
+  padding: 20px;
+  background-color: #ffffff1b;
+  border-radius: 10px;
+  min-width: 400px;
+  min-height: 200px;
+}
+
+.dropped-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+.MuiTableRow-root:nth-of-type(odd) {
+  background-color: #b0b0b0;
+}
+
+
+.workspace-item {
+  background-color: #d1e7dd;
+  padding: 8px 12px;
+  border-radius: 6px;
+}

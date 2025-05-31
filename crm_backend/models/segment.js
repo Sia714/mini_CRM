@@ -5,9 +5,10 @@ const { ObjectId } = mongoose.Schema.Types;
 const segmentSchema = new mongoose.Schema(
   {
     segmentName: String,
-    createdBy: { ObjectId, ref: "User" },
+    createdBy: { type: ObjectId, ref: "User" },
     conditions: [
       {
+        visits: Number,
         lastVisited: Date,
         totalSpent: Number,
         averageRating: Number,

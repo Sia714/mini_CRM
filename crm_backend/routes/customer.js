@@ -14,6 +14,7 @@ router.post("/addCustomer", async (req, res) => {
       email: data.email,
       fullAddress: data.fullAddress,
       lastVisited: data.lastVisited,
+      visits: data.visits,
       totalOrders: data.totalOrders,
       totalSpent: data.totalSpent,
       lastRating: data.lastRating,
