@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   TextField,
   Button,
@@ -9,6 +9,7 @@ import {
   Paper,
   Radio, RadioGroup, FormControlLabel, FormLabel,
 } from "@mui/material";
+
 function AddNewCustomer({ categories }: { categories: string[] }) {
   const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -26,7 +27,24 @@ function AddNewCustomer({ categories }: { categories: string[] }) {
   const [category, setCategory] = useState("");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-
+type user={
+  name:String,
+  email:String,
+  photo: URL,
+}
+  const [userData,setUserData]=useState<user>();
+   const loadUserData=()=>{
+      fetch(`${API_BASE}/auth/me`, { credentials: 'include',})
+          .then(res=>res.json())
+          .then(details=>{
+              setUserData(details||[]);
+          })
+           .catch((err) => console.error(err));
+    }
+     useEffect(()=>{
+      loadUserData();
+      
+    },[])
 
   const validateFields = () => {
     const newErrors: Record<string, string> = {};
@@ -54,6 +72,7 @@ function AddNewCustomer({ categories }: { categories: string[] }) {
 
     try {
       const response = await fetch(`${API_BASE}/customer/addCustomer`, {
+        credentials: 'include',
         method: "POST",
         headers: {
           "Content-Type": "application/json",

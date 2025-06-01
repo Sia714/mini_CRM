@@ -2,31 +2,68 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  // Navigate,
 } from "react-router-dom";
-// import { useState } from 'react'
-import Auth from './pages/Auth'
-import Dashboard from './pages/Dashboard'
-import Campaign from './pages/campaign'
 
-import './App.css'
+import Dashboard from './pages/Dashboard';
+import Campaign from './components/campaign';
 
+import { useState, useEffect } from "react";
+import ProtectedRoute from "./components/protectedRoute";
+import './App.css';
+import SegmentCampaign from "./components/segmentCampaign";
+import Auth from "./pages/Auth";
+import { UserProvider } from "./contexts/UserContext";
 function App() {
+  const [user, setUser] = useState<false| []|null>(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/auth/me", {
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized");
+        return res.json();
+      })
+      .then((data) => setUser(data))
+      .catch(() => setUser(false));
+  }, []);
 
   return (
-    <>
       <Router>
         <Routes>
-          <Route path="/" element={<Auth/>}/>
-          <Route path="/dashboard" element={<Dashboard/>}/>
-          <Route path="/campaign" element={<Campaign/>}/>
- 1        <Route
-              path="/campaign/:id"
-            />
+          <Route
+            path="/auth"
+            element={<Auth />}
+          />
+          
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute user={user}>
+                <Dashboard user={user} />
+              </ProtectedRoute>
+            }
+          />
+          {/* <Route
+            path="/campaign/:segmentId"
+            element={
+              <ProtectedRoute user={user}>
+                <Campaign />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/segment"
+            element={
+              <ProtectedRoute user={user}>
+                <SegmentCampaign />
+              </ProtectedRoute>
+            }
+          /> */}
         </Routes>
       </Router>
-    </>
-  )
+  
+  );
 }
 
-export default App
+export default App;

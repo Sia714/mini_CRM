@@ -1,6 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef,useEffect } from "react";
 import "../styles/segment.css"; // <- Your CSS file
-import { Button, Box, Typography, Paper, TextField } from "@mui/material";
+import { Button, Box, Typography, Paper, TextField, IconButton } from "@mui/material";
+import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
+import ClearIcon from '@mui/icons-material/Clear';
 import {
   Table,
   TableBody,
@@ -16,6 +18,8 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
 
 type Item={
     id:string;
@@ -25,11 +29,33 @@ type Item={
       followedBy?:string[];
 
 }
-const SegmentCampaign = () => {
+type user={
+  name:String,
+  email:String,
+  photo: URL,
+}
+
+
+function SegmentCampaign() {
   const API_BASE = import.meta.env.VITE_API_BASE;
+const navigate = useNavigate();
+
+  const [userData,setUserData]=useState<user|null>();
+   const loadUserData=()=>{
+      fetch(`${API_BASE}/auth/me`, { credentials: 'include',})
+          .then(res=>res.json())
+          .then(details=>{
+              setUserData(details||[]);
+          })
+           .catch((err) => console.error(err));
+    }
+     useEffect(()=>{
+      loadUserData();
+      
+    },[])
   const [workspace, setWorkspace] = useState<Item[]>([]);
   const [draggedItem, setDraggedItem] = useState<Item | null>(null);
-  const [showInstructions, setShowInstructions] = useState<boolean>(true);
+  const [showInstructions, setShowInstructions] = useState<boolean>(false);
 
   const tableRef = useRef<HTMLDivElement>(null);
 
@@ -45,10 +71,11 @@ const SegmentCampaign = () => {
     category: String,
     isActive: Boolean,}
   const [previewCustomers,setPreviewCustomers]=useState<customer[]>([]);
+
   const boxes: Record<string, Item[]>= {
     Logical: [
-      {id:"L1",label:"AND",type:"logical",precededBy:["value"],followedBy:["field"]},
-      {id:"L2",label:"OR",type:"logical",precededBy:["value"],followedBy:["field"]},
+      {id:"L1",label:"AND",type:"logical",precededBy:["value","category"],followedBy:["field"]},
+      {id:"L2",label:"OR",type:"logical",precededBy:["value","category"],followedBy:["field"]},
     ],
     Operators: [
       {id:"O1",label:"<=",type:"operator",precededBy:["field"],followedBy:["value"]},
@@ -112,17 +139,15 @@ const SegmentCampaign = () => {
     }
     for (let i = 0; i < workspace.length; i++) {
       const token = workspace[i];
-
+ console.log("TOKEN:", token); 
       if (["AND", "OR"].includes(token.label.toString())) {
         result.push({ logic: token });
       } 
-      else if ( ["<", "<=", ">", ">=", "==","!="].includes(workspace[i + 1]?.label.toString()) ) {
+      else if ( ["<", "<=", ">", ">=", "=","!="].includes(workspace[i + 1]?.label.toString()) ) {
         result.push({
           field: token,
           operator: workspace[i + 1],
-          value: isNaN(Number(workspace[i + 2]))
-            ? workspace[i + 2]
-            : Number(workspace[i + 2]),
+          value: workspace[i + 2]
         });
         i += 2; // Skip next 2 tokens
       }
@@ -220,6 +245,9 @@ const handleValueChange = (index: number, newValue: string) => {
     )
   );
 };
+  const clearWorkspace=()=>{
+    setWorkspace([]);
+  }
   const previewSegment=()=>{
     
       const payload = parseWorkspace(workspace);
@@ -234,14 +262,16 @@ const handleValueChange = (index: number, newValue: string) => {
     return {
       field: rule.field?.label,
       operator: rule.operator?.label,
-      value: rule.value?.input || rule.value?.label,
+      value: typeof rule.value === "object"
+    ? rule.value.input || rule.value.label || rule.value.value
+    : rule.value,
     };
 
   });
 
      const queryStr = encodeURIComponent(JSON.stringify(querySeg));
-
-      fetch(`${API_BASE}/segment/preview?rules=${queryStr}`)
+      console.log(querySeg);
+      fetch(`${API_BASE}/segment/preview?rules=${queryStr}`, { credentials: 'include',})
       .then(res => res.json())
       .then(data =>{
          setPreviewCustomers(data.customers || []);
@@ -254,32 +284,40 @@ const handleValueChange = (index: number, newValue: string) => {
     }catch(e){console.error(e);}
       
   }
+
   const addSegment = () => {
   const payload = parseWorkspace(workspace);
-  if (!payload) {
-    alert("Invalid query");
-    return;
-  }
+  // if (!payload) {
+  //   alert("Invalid query");
+  //   return;
+  // }
+      console.log("Parsed payload:", payload);
+
+  
   const segName=prompt("Please enter a segment Name");
   try{
-  const querySeg = payload.map((rule) => {
+  const querySeg = payload?.map((rule) => {
     if (rule.logic) return { logic: rule.logic.label };
     return {
       field: rule.field.label,
       operator: rule.operator.label,
-      value: rule.value?.input || rule.value?.label,
+      value: typeof rule.value === "object"
+    ? rule.value.input || rule.value.label || rule.value.value
+    : rule.value,
     };
   });
-
+  console.log(querySeg);
   fetch(`${API_BASE}/segment/addSegment`, {
+    credentials: 'include',
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: segName, rules: querySeg }),
+    body: JSON.stringify({ name: segName,createdBy:userData?.email, rules: querySeg }),
   })
     .then((res) => res.json())
     .then((data) => {
       alert("Segment Added successfully");
-      window.location.href=`/campaign/${data.id}`;
+      navigate(`/campaign/${data.id}`);
+
       setPreviewCustomers([]);
       setWorkspace([]);
 
@@ -287,6 +325,7 @@ const handleValueChange = (index: number, newValue: string) => {
     .catch((err) => console.error(err));
     }catch(e){console.error(e);}
 };
+
 
 const primaryBoxNames = ["Logical", "Operators", "Field"];
 
@@ -336,9 +375,10 @@ const otherBoxes = Object.entries(boxes).filter(
     <Button variant="outlined" onClick={addSegment}>
       ADD Segment
     </Button>
-     <Button variant="outlined" onClick={addSegment}>
+     <Button variant="outlined" onClick={()=>navigate("/view-segments")}>
       View Segments
     </Button>
+      
   </Box>
 
   <Box className="container">
@@ -362,10 +402,31 @@ const otherBoxes = Object.entries(boxes).filter(
 
     <Box
       className="workspace"
+      sx={{position:"relative"}}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-    >
+    ><Box
+     sx={{
+        position: "absolute",
+        top: 15,
+        right: 10,
+        zIndex: 10,
+      }}
+    ><IconButton  aria-color="secondary"
+    
+      onClick={() => setShowInstructions(true)} >
+        
+    <InfoOutlineIcon />
+  </IconButton>
+  <IconButton  aria-color="secondary"
+   
+      onClick={() => clearWorkspace()} >
+        
+    <ClearIcon />
+  </IconButton>
+  </Box>
       <Typography variant="h5" color="white" mb={2}>Workspace</Typography>
+      
       <Box className="dropped-items">
         {workspace.map((item, idx) => (
           <Box
@@ -408,44 +469,46 @@ const otherBoxes = Object.entries(boxes).filter(
     </Box>
   </Box>
 
-
-
-{previewCustomers.length > 0 && (
-  <Box mt={4} ref={tableRef} className="table">
+<Box mt={4} ref={tableRef} className="table">
     <Typography variant="h5" gutterBottom color="white">
-      Preview Customers
-    </Typography>
-      <Typography variant="h6" color="white">
-      {"Audience size: " + previewCustomers.length}
-    </Typography>
-    <TableContainer component={Paper}>
-      <Table stickyHeader aria-label="sticky table">
-        <TableHead>
-          <TableRow>
-            <TableCell>#</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Phone</TableCell>
-            <TableCell>Last Active</TableCell>
-            <TableCell>Total Spent</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {previewCustomers.map((c: customer, idx) => (
-            <TableRow key={idx}>
-              <TableCell>{idx + 1}</TableCell>
-              <TableCell>{c.name}</TableCell>
-              <TableCell>{c.email}</TableCell>
-              <TableCell>{c.mobile || "-"}</TableCell>
-              <TableCell>{c.lastVisited ? new Date(c.lastVisited).toLocaleDateString() : "-"}</TableCell>
-              <TableCell>₹{c.totalSpent?.toLocaleString() || "0"}</TableCell>
+          Preview Customers
+        </Typography>
+        <Typography variant="h6" color="white">
+          Audience size: {previewCustomers.length??'0'}
+        </Typography>
+    {previewCustomers.length > 0 ?(
+      
+      <TableContainer component={Paper}>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead>
+            <TableRow>
+              <TableCell>#</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Phone</TableCell>
+              <TableCell>Last Active</TableCell>
+              <TableCell>Total Spent</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {previewCustomers.map((c: customer, idx) => (
+              <TableRow key={idx}>
+                <TableCell>{idx + 1}</TableCell>
+                <TableCell>{c.name}</TableCell>
+                <TableCell>{c.email}</TableCell>
+                <TableCell>{c.mobile || "-"}</TableCell>
+                <TableCell>{c.lastVisited ? new Date(c.lastVisited).toLocaleDateString() : "-"}</TableCell>
+                <TableCell>₹{c.totalSpent?.toLocaleString() || "0"}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+    ):( <Typography variant="h6" color="white">
+        No Data to Display
+      </Typography>)}
   </Box>
-)}
 
 </>
 

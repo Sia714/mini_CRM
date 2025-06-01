@@ -9,8 +9,11 @@ import {
   Paper,
 } from '@mui/material';
 
+type AuthProps = {
+  setUser: React.Dispatch<React.SetStateAction<any>>;
+};
 
-function App() {
+const Auth = () => {
 
     const [tab, setTab] = useState(0);
   const [formData, setFormData] = useState({
@@ -32,6 +35,15 @@ function App() {
     e.preventDefault();
     console.log(tab === 0 ? 'Logging in...' : 'Signing up...', formData);
   };
+  // LoginButton.tsx
+
+  const handleLogin = () => {
+    window.location.href = "http://localhost:5000/auth/google";
+  };
+
+
+
+
 
     return(
         <>
@@ -83,6 +95,7 @@ function App() {
             type="submit"
             fullWidth
             variant="contained"
+            onClick={handleLogin}
             sx={{ mt: 2 }}
             color="primary"
           >
@@ -103,4 +116,4 @@ function App() {
         </>
     )
 }
-export default App;
+export default Auth;

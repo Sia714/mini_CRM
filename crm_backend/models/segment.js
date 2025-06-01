@@ -5,15 +5,12 @@ const { ObjectId } = mongoose.Schema.Types;
 const segmentSchema = new mongoose.Schema(
   {
     segmentName: String,
-    createdBy: { type: ObjectId, ref: "User" },
+    createdBy: String,
     conditions: [
       {
-        visits: Number,
-        lastVisited: Date,
-        totalSpent: Number,
-        averageRating: Number,
-        lastRating: Number,
-        mostInterested: String,
+        field: String,
+        operator: String,
+        value: Schema.Types.Mixed, // Boolean, String, Number, etc.
       },
     ],
     previewCount: Number,

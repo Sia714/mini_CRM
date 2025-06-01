@@ -7,7 +7,7 @@ const campaignSchema = new Schema(
     segmentId: { type: ObjectId, ref: "Segment" },
     campaignObjective: String,
     messagesUsed: [String], // array of AI-generated suggestions
-    createdBy: { type: ObjectId, ref: "User" },
+    createdBy: String,
     sentCount: Number,
     failedCount: Number,
     previewCount: Number,

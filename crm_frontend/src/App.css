@@ -1,8 +1,23 @@
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0 0;
   text-align: center;
+  background-image: radial-gradient(rgba(22, 24, 146, 0.478),rgba(0, 0, 3, 0.538));
+
+}
+body {
+  margin: 0;
+  overflow-x: hidden;
+  
+}
+
+.app-wrapper.blurred {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.5;
+
 }
 
 .logo {

@@ -35,6 +35,24 @@ const [searchQuery, setSearchQuery] = useState("");
 const [searchResults, setSearchResults] = useState<Customer[]>([]);
 const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  type user={
+    name:String,
+    email:String,
+    photo: URL,
+  }
+    const [userData,setUserData]=useState<user>();
+     const loadUserData=()=>{
+        fetch(`${API_BASE}/auth/me`, { credentials: 'include',})
+            .then(res=>res.json())
+            .then(details=>{
+                setUserData(details||[]);
+            })
+             .catch((err) => console.error(err));
+      }
+       useEffect(()=>{
+        loadUserData();
+        
+      },[])
   const validateFields = () => {
     const newErrors: Record<string, string> = {};
     if (!product) newErrors.name = "Product Name is required";
@@ -48,7 +66,7 @@ const [loading, setLoading] = useState(false);
  useEffect(() => {
   const timeout = setTimeout(() => {
     if (searchQuery.length > 2) {
-      fetch(`${API_BASE}/customer/search?query=${searchQuery}`)
+      fetch(`${API_BASE}/customer/search?query=${searchQuery}`, { credentials: 'include',})
         .then((res) => res.json())
         .then((data) => {
           if (Array.isArray(data)) {
@@ -74,6 +92,7 @@ const [loading, setLoading] = useState(false);
 
     try {
       const response = await fetch(`${API_BASE}/customer/addOrder`, {
+        credentials: 'include',
         method: "POST",
         headers: {
           "Content-Type": "application/json",

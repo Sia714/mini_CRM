@@ -1,43 +1,263 @@
-// import React, { useState } from "react";
-import {
-  Grid
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import ViewSegments from "../components/viewSegments";
+import { Grid } from "@mui/material";
+import { IconButton, Avatar, Menu, MenuItem, Button,Box,Typography,  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemText, } from "@mui/material";
 import AddNewCustomer from "../components/addNewCustomer";
 import AddNewOrder from "../components/addNewOrder";
+import { createTheme, styled } from "@mui/material/styles";
 import SegmentCampaign from "../components/segmentCampaign";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import DescriptionIcon from "@mui/icons-material/Description";
+import LayersIcon from "@mui/icons-material/Layers";
+import { AppProvider,type Navigation, type NavigationItem} from "@toolpad/core/AppProvider";
+import { DashboardLayout } from "@toolpad/core/DashboardLayout";
+import { PageContainer } from "@toolpad/core/PageContainer";
+import Campaign from "../components/campaign";
 
-function Dashboard() {
-//   const API_BASE = import.meta.env.VITE_API_BASE;
+type MyNavItem = {
+  kind?: "header";
+  title: string;
+  icon?: React.ReactNode;
+  url?: string;
+};
+
+const getNavigation = (user: any): MyNavItem[] => [
+  {
+    kind: "header" as const,
+    title: "Main",
+  },
+  {
+    url: "dashboard",
+    title: "Dashboard",
+    icon: <DashboardIcon />,
+  },
+  ...(user ? [
+    {
+      url: "add-customer",
+      title: "Add Customer",
+      icon: <ShoppingCartIcon />,
+    },
+    {
+      url: "add-order",
+      title: "Add Order",
+      icon: <LayersIcon />,
+    },
+    {
+      kind: "header" as const,
+      title: "Segments",
+    },
+    {
+      url: "segment",
+      title: "View Segments",
+      icon: <BarChartIcon />,
+    },
+    {
+      kind: "header" as const,
+      title: "Campaigns",
+    },
+    {
+      url: "campaign",
+      title: "Campaign History",
+      icon: <BarChartIcon />,
+    },
+  ] : []),
+];
+
+const demoTheme = createTheme(
+//   {
+//   colorSchemes: { light: true, dark: true },
+//   cssVariables: {
+//     colorSchemeSelector: "class",
+//   },
+//   breakpoints: {
+//     values: {
+//       xs: 0,
+//       sm: 600,
+//       md: 600,
+//       lg: 1200,
+//       xl: 1536,
+//     },
+//   },
+// }
+);
+
+
+
+type DashboardProps = {
+  user: any; // or a more specific type if you have one
+};
+
+function Dashboard({ user }: DashboardProps) {
+  
+  const API_BASE = import.meta.env.VITE_API_BASE;
+type user={
+  name:String,
+  email:String,
+  photo: URL,
+}
+  const [userData,setUserData]=useState<user|null>();
+   const loadUserData=()=>{
+      fetch(`${API_BASE}/auth/me`, { credentials: 'include',})
+          .then(res=>res.json())
+          .then(details=>{
+              setUserData(details||[]);
+          })
+           .catch((err) => console.error(err));
+    }
+     useEffect(()=>{
+      loadUserData();
+      
+    },[])
+    const navigate = useNavigate();
+const location = useLocation();
+
+const router = {
+  navigate: async (to: string | URL) => {
+    navigate(typeof to === "string" ? to : to.toString());
+  },
+  pathname: location.pathname,
+  searchParams: new URLSearchParams(location.search),
+};
+
+
+
+  
+    const handleLogin = () => {
+    window.location.href =`${API_BASE}/auth/google`;
+  };
+
+  const handleLogout = () => {
+    fetch(`${API_BASE}/auth/logout`)
+    .then(() => {
+      setUserData(null);
+    })
+    .catch(err => console.error(err));
+  };
+  useEffect(() => {
+    loadUserData();
+  },[]);
+  const login = Boolean(userData && Object.keys(userData).length > 0);
+
+
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const categories = [
-  "Electronics",
-  "Smartphones",
-  "Fashion",
-  "Home & Kitchen",
-  "Beauty & Personal Care",
-  "Sports & Outdoors",
-  "Books",
-  "Toys & Games",
-  "Grocery & Gourmet Food",
-  "Automotive",
-];
+    "Electronics",
+    "Smartphones",
+    "Fashion",
+    "Home & Kitchen",
+    "Beauty & Personal Care",
+    "Sports & Outdoors",
+    "Books",
+    "Toys & Games",
+    "Grocery & Gourmet Food",
+    "Automotive",
+  ];
+
   return (
     <>
-    {/* <Grid container direction="row" spacing={2}  sx={{
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-  }}>
-        <Grid size={{ xs: 12, md: 6 }}>
-    <AddNewCustomer categories={categories}/>
-    </Grid>
-    <Grid size={{ xs: 12, md: 6 }}>
-    <AddNewOrder categories={categories}/>
-    </Grid>
-    
-    </Grid> */}
-    <SegmentCampaign />
-    </>
+    <Dialog open={!login}>
+        <DialogTitle>Login required</DialogTitle>
+        <DialogContent>
+          <List>
+             <ListItem>
+              <ListItemText>
+                ▶ Login to access this page
+              </ListItemText>
+            </ListItem>        
+          </List>
+        </DialogContent>
 
+        <DialogActions>
+          <Button variant="outlined" onClick={handleLogin}>
+          Login
+        </Button>
+        </DialogActions>
+      </Dialog>
+
+  <AppProvider
+  navigation={getNavigation(user) as Navigation}
+  router={router}
+  theme={demoTheme}
+>
+
+    <Box
+      sx={{
+        position: "fixed",
+        top: 5,
+        right: 24,
+        zIndex: 1210,
+      }}
+    >
+      
+      {login ?(
+        <>
+          <IconButton onClick={handleClick}>
+            <Avatar alt="User" src="/profile-placeholder.png" />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+          >
+            <MenuItem onClick={handleClose}>Your Campaigns</MenuItem>
+            <MenuItem onClick={handleClose}>Profile</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
+          </>
+        ):(  <Button variant="outlined" onClick={handleLogin}>
+          Login
+        </Button>)}
+      
+    </Box>
+
+
+    <DashboardLayout>
+     <PageContainer
+  className={user ? "app-wrapper" : "app-wrapper blurred"}
+  sx={{
+    width: "100%",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "2rem",
+    overflowX: "hidden",
+    boxSizing: "border-box",
+  }}
+>
+ <Routes>
+  <Route path="/dashboard" element={<SegmentCampaign />} />
+  <Route path="/add-customer" element={<AddNewCustomer categories={categories} />} />
+  <Route path="/add-order" element={<AddNewOrder categories={categories} />} />
+  <Route path="/segment" element={<div>Segments List Here</div>} />
+  <Route path="/view-segment" element={<ViewSegments />} />
+  <Route path="/campaign" element={<Campaign />} />
+  <Route path="/campaign/:segmentId" element={<Campaign />} />
+</Routes>
+
+</PageContainer>
+
+      </DashboardLayout>
+    </AppProvider>
+    </>
   );
 }
 
