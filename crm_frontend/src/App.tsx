@@ -12,7 +12,9 @@ import ProtectedRoute from "./components/protectedRoute";
 import './App.css';
 import SegmentCampaign from "./components/segmentCampaign";
 import Auth from "./pages/Auth";
-import { UserProvider } from "./contexts/UserContext";
+import AddNewCustomer from "./components/addNewCustomer";
+import AddNewOrder from "./components/addNewOrder";
+import ViewSegments from "./components/viewSegments";
 function App() {
   const [user, setUser] = useState<false| []|null>(null);
 
@@ -30,39 +32,31 @@ function App() {
 
   return (
       <Router>
-        <Routes>
-          <Route
-            path="/auth"
-            element={<Auth />}
-          />
-          
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute user={user}>
-                <Dashboard user={user} />
-              </ProtectedRoute>
-            }
-          />
-          {/* <Route
-            path="/campaign/:segmentId"
-            element={
-              <ProtectedRoute user={user}>
-                <Campaign />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/segment"
-            element={
-              <ProtectedRoute user={user}>
-                <SegmentCampaign />
-              </ProtectedRoute>
-            }
-          /> */}
-        </Routes>
-      </Router>
-  
+  <Routes>
+    {/* Login/Auth Route */}
+    <Route path="/auth" element={<Auth />} />
+
+    {/* Protected Dashboard Route */}
+    <Route
+      path="/"
+      element={
+        <ProtectedRoute user={user}>
+          <Dashboard user={user} />
+        </ProtectedRoute>
+      }
+    >
+      <Route index element={<SegmentCampaign />} />
+      <Route path="dashboard" element={<SegmentCampaign />} />
+
+      <Route path="add-customer" element={<AddNewCustomer />} />
+      <Route path="add-order" element={<AddNewOrder />} />
+      <Route path="view-segment" element={<ViewSegments />} />
+      <Route path="campaign" element={<Campaign />} />
+      <Route path="campaign/:segmentId" element={<Campaign />} />
+    </Route>
+  </Routes>
+</Router>
+
   );
 }
 

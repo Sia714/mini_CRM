@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 const passport = require("passport");
 const session = require("express-session");
 const ensureLoggedIn = require("./middlewares/ensureLoggedIn");
-
+const axios = require("axios");
 const app = express();
 dotenv.config();
 
@@ -40,7 +40,7 @@ mongoose
 
 app.use("/auth", require("./routes/authorize"));
 // app.use(ensureLoggedIn);
-
+app.use("/vendor", require("./routes/vendor"));
 app.use("/ai", require("./routes/ai"));
 app.use("/customer", require("./routes/customer"));
 app.use("/segment", require("./routes/segment"));

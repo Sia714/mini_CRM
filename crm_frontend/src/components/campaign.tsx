@@ -18,6 +18,7 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  CircularProgress,
 } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 
@@ -66,6 +67,7 @@ const { segmentId: paramSegmentId } = useParams<{ segmentId?: string }>();
   const [graphData, setGraphData] = useState<GraphData[]>([]);
   const [aiMessages, setAiMessages] = useState<string[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
+  const [campaignObjective,setCampaignObjective]=useState<string | null>(null);
   const navigate=useNavigate();
   const [loadingAI, setLoadingAI] = useState(false);
 type user={
@@ -87,7 +89,7 @@ type user={
       
     },[])
   const loadSegments = () => {
-    fetch(`${API_BASE}/segment/`, { credentials: "include" })
+    fetch(`${API_BASE}/segment/getAllSegments`, { credentials: "include" })
       .then((res) => res.json())
       .then((details) => {
         setSegmentOptions(details.segments || []);
@@ -146,24 +148,28 @@ type user={
   };
 
   const handleNewCampaign = async () => {
-    const campaignObjective = prompt("Enter the Campaign's Objective");
-    if (!campaignObjective || !selectedSegmentId) return;
+    const campaignObj = prompt("Enter the Campaign's Objective");
+    setCampaignObjective(campaignObj);
+    if (!campaignObj || !selectedSegmentId) return;
     setSelectedMessage(null); // Reset previous selection
     await fetchAISuggestions();
   };
 
   const launchCampaign = () => {
     if (!selectedSegmentId || !selectedMessage) return;
-
-    fetch(`${API_BASE}/segment/${selectedSegmentId}/addCampaign`, {
+    const prompt=JSON.stringify({
+        segmentId: selectedSegmentId,
+        createdBy: userData?.email,
+        messagesUsed: aiMessages,
+        campaignObjective: campaignObjective, // or use original objective if saved
+        selectedMessage: selectedMessage,
+      });
+      console.log(prompt);
+    fetch(`${API_BASE}/segment/${selectedSegmentId}/`, {
       credentials: "include",
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        segmentId: selectedSegmentId,
-        campaignObjective: selectedMessage, // or use original objective if saved
-        messageToSend: selectedMessage,
-      }),
+      body: prompt,
     })
       .then((res) => res.json())
       .then(() => {
@@ -171,6 +177,7 @@ type user={
         loadSegmentData(selectedSegmentId);
         setAiMessages([]);
         setSelectedMessage(null);
+        setCampaignObjective(null);
       })
       .catch((err) => console.error(err));
   };
@@ -217,15 +224,32 @@ type user={
             {selectedSegment?.segmentName}'s Campaigns
           </Typography>
           <Typography variant="h6">
-            Number of campaigns launched: {campaigns.length}
+           Created At: {selectedSegment?.createdAt.toLocaleString()} 
           </Typography>
+           <Typography variant="h6">
+           Latest Campaign: {campaigns[0]?.campaignObjective?? "N/A"} 
+          </Typography>
+          <Typography variant="h6">
+  Conditions:{" "}
+  {selectedSegment?.conditions?.length ? (
+    selectedSegment.conditions.map((cond, index) => (
+      <span key={index}>
+        {cond.field} {cond.operator} {String(cond.value)}
+        {index !== selectedSegment.conditions.length - 1 ? ", " : ""}
+      </span>
+    ))
+  ) : (
+    "N/A"
+  )}
+</Typography>
 
           <Box sx={{ display: "flex", gap: 2, mb: 2, mt: 1 }}>
             <Button variant="outlined" onClick={handleNewCampaign}>
               Add Campaign
             </Button>
           </Box>
-
+          {campaignObjective?"Campaign Objective:"+ campaignObjective:" "}<br/>
+          {loadingAI && <CircularProgress/>}
           {aiMessages.length > 0 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Typography variant="subtitle1">

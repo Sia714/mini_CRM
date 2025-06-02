@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import ViewSegments from "../components/viewSegments";
 import { Grid } from "@mui/material";
 import { IconButton, Avatar, Menu, MenuItem, Button,Box,Typography,  Dialog,
@@ -23,52 +23,22 @@ import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { PageContainer } from "@toolpad/core/PageContainer";
 import Campaign from "../components/campaign";
 
-type MyNavItem = {
-  kind?: "header";
-  title: string;
-  icon?: React.ReactNode;
-  url?: string;
-};
-
-const getNavigation = (user: any): MyNavItem[] => [
-  {
-    kind: "header" as const,
-    title: "Main",
-  },
-  {
-    url: "dashboard",
-    title: "Dashboard",
-    icon: <DashboardIcon />,
-  },
+// type MyNavItem = {
+//   kind?: string;
+//   title: string;
+//   icon?: React.ReactNode;
+//   url?: string;
+// };
+const getNavigation = (user: any): NavigationItem[] => [
+  { kind: "header" as const, title: "Main" },
+  { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   ...(user ? [
-    {
-      url: "add-customer",
-      title: "Add Customer",
-      icon: <ShoppingCartIcon />,
-    },
-    {
-      url: "add-order",
-      title: "Add Order",
-      icon: <LayersIcon />,
-    },
-    {
-      kind: "header" as const,
-      title: "Segments",
-    },
-    {
-      url: "segment",
-      title: "View Segments",
-      icon: <BarChartIcon />,
-    },
-    {
-      kind: "header" as const,
-      title: "Campaigns",
-    },
-    {
-      url: "campaign",
-      title: "Campaign History",
-      icon: <BarChartIcon />,
-    },
+    { segment: "add-customer", title: "Add Customer", icon: <ShoppingCartIcon /> },
+    { segment: "add-order", title: "Add Order", icon: <LayersIcon /> },
+    { kind: "header" as const, title: "Segments" },
+    { segment: "view-segment", title: "View Segments", icon: <BarChartIcon /> },
+    { kind: "header" as const, title: "Campaigns" },
+    { segment: "campaign", title: "Campaign History", icon: <BarChartIcon /> },
   ] : []),
 ];
 
@@ -122,12 +92,18 @@ const location = useLocation();
 
 const router = {
   navigate: async (to: string | URL) => {
-    navigate(typeof to === "string" ? to : to.toString());
+    let path = typeof to === "string" ? to : to.toString();
+    if (path === "" || path === "/") {
+      navigate("/dashboard");
+      return;
+    }
+    if (path.startsWith("/")) path = path.slice(1);
+    const finalPath = `${path}`.replace(/\/+/g, '/');
+    navigate(finalPath);
   },
   pathname: location.pathname,
   searchParams: new URLSearchParams(location.search),
 };
-
 
 
   
@@ -158,19 +134,7 @@ const router = {
     setAnchorEl(null);
   };
 
-  const categories = [
-    "Electronics",
-    "Smartphones",
-    "Fashion",
-    "Home & Kitchen",
-    "Beauty & Personal Care",
-    "Sports & Outdoors",
-    "Books",
-    "Toys & Games",
-    "Grocery & Gourmet Food",
-    "Automotive",
-  ];
-
+  
   return (
     <>
     <Dialog open={!login}>
@@ -229,9 +193,7 @@ const router = {
         </Button>)}
       
     </Box>
-
-
-    <DashboardLayout>
+    <DashboardLayout >
      <PageContainer
   className={user ? "app-wrapper" : "app-wrapper blurred"}
   sx={{
@@ -243,15 +205,8 @@ const router = {
     boxSizing: "border-box",
   }}
 >
- <Routes>
-  <Route path="/dashboard" element={<SegmentCampaign />} />
-  <Route path="/add-customer" element={<AddNewCustomer categories={categories} />} />
-  <Route path="/add-order" element={<AddNewOrder categories={categories} />} />
-  <Route path="/segment" element={<div>Segments List Here</div>} />
-  <Route path="/view-segment" element={<ViewSegments />} />
-  <Route path="/campaign" element={<Campaign />} />
-  <Route path="/campaign/:segmentId" element={<Campaign />} />
-</Routes>
+  <Outlet />
+
 
 </PageContainer>
 

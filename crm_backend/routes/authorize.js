@@ -36,11 +36,11 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/error",
-    successRedirect: "http://localhost:5173/dashboard", // or wherever
+    successRedirect: process.env.FRONTEND_URL, // or wherever
   })
 );
 
-router.get("/me", (req, res) => {
+router.get("/me", ensureLoggedIn, (req, res) => {
   const user = req.user;
   res.json({
     name: user.displayName,
@@ -50,7 +50,7 @@ router.get("/me", (req, res) => {
 });
 router.get("/logout", (req, res) => {
   req.logout(() => {
-    res.redirect("http://localhost:5173/");
+    res.redirect(process.env.FRONTEND_URL);
   });
 });
 

@@ -1,4 +1,5 @@
 import React, { useState,useEffect } from "react";
+
 import {
   TextField,
   Button,
@@ -22,10 +23,12 @@ import {
     ListItem,
     ListItemText
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 function ViewSegments() {
   const API_BASE = import.meta.env.VITE_API_BASE;
 type segment={
+    _id: string,
      segmentName: string,
     createdBy: string,
     conditions: [
@@ -47,6 +50,7 @@ const [loading, setLoading] = useState(false);
     email:String,
     photo: URL,
   }
+  const navigate=useNavigate();
     const [userData,setUserData]=useState<user>();
      const loadUserData=()=>{
         fetch(`${API_BASE}/me`, { credentials: 'include',})
@@ -61,7 +65,7 @@ const [loading, setLoading] = useState(false);
         
       },[])
  const loadSegments = () => {
-    fetch(`${API_BASE}/segment/`, { credentials: "include" })
+    fetch(`${API_BASE}/segment/getAllSegments`, { credentials: "include" })
       .then((res) => res.json())
       .then((details) => {
         setSegments(details.segments || []);
@@ -97,13 +101,14 @@ const [loading, setLoading] = useState(false);
           </TableHead>
           <TableBody>
             {segments.map((s: segment, idx) => (
-              <TableRow key={idx}>
+              <TableRow key={idx} onClick={()=>navigate(`/campaign/${s._id}`)}>
                 <TableCell>{idx + 1}</TableCell>
                 <TableCell>{s.segmentName}</TableCell>
                 <TableCell>{s.createdBy}</TableCell>
                 <TableCell>{s.previewCount || "-"}</TableCell>
                 <TableCell>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "-"}</TableCell>
               </TableRow>
+          
             ))}
           </TableBody>
         </Table>

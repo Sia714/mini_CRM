@@ -307,7 +307,7 @@ const handleValueChange = (index: number, newValue: string) => {
     };
   });
   console.log(querySeg);
-  fetch(`${API_BASE}/segment/addSegment`, {
+  fetch(`${API_BASE}/segment/`, {
     credentials: 'include',
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -375,7 +375,7 @@ const otherBoxes = Object.entries(boxes).filter(
     <Button variant="outlined" onClick={addSegment}>
       ADD Segment
     </Button>
-     <Button variant="outlined" onClick={()=>navigate("/view-segments")}>
+     <Button variant="outlined" onClick={()=>navigate("view-segment")}>
       View Segments
     </Button>
       

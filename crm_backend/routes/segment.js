@@ -2,11 +2,12 @@ const express = require("express");
 const router = express.Router();
 const Customer = require("../models/customer");
 const mongoose = require("mongoose");
+const axios = require("axios");
 const Segment = require("../models/segment");
 const CommunicationLog = require("../models/communicationLog");
-
 const ensureLoggedIn = require("../middlewares/ensureLoggedIn");
 const segment = require("../models/segment");
+
 // router.use(ensureLoggedIn);
 
 router.get("/debug", (req, res) => {
@@ -17,10 +18,9 @@ router.get("/debug", (req, res) => {
   });
 });
 
-router.get("/", async (req, res) => {
+router.get("/getAllSegments", async (req, res) => {
   try {
     const segments = await Segment.find();
-
     res.json({ segments });
   } catch (err) {
     console.error(err);
@@ -88,7 +88,7 @@ function convertOp(op) {
   );
 }
 
-router.post("/addSegment", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const rules = req.body.rules;
     if (!Array.isArray(rules)) {
@@ -117,14 +117,10 @@ router.get("/:segmentId", async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(segmentId)) {
       return res.status(400).json({ error: "Invalid segmentId format" });
     }
-    const sortOptions = {
-      createdAt: 1, // Ascending order for fieldName1
-      // segmentName: -1, // Descending order for fieldName2
-    };
 
     const reqCampaigns = await CommunicationLog.find({ segmentId })
-      .populate("segmentId")
-      .sort(sortOptions);
+      .sort({ createdAt: -1 }) // newest campaign first
+      .lean();
     const seg = await segment.findById(segmentId);
 
     res.json({ segment: seg, campaigns: reqCampaigns });
@@ -133,30 +129,32 @@ router.get("/:segmentId", async (req, res) => {
   }
 });
 
-router.post("/:segmentId/addCampaign", async (req, res) => {
+router.post("/:segmentId/", async (req, res) => {
   try {
-    const { segmentId, campaignObjective, createdBy } = req.body;
+    const { segmentId } = req.params;
+    const { campaignObjective, createdBy, selectedMessage, messagesUsed } =
+      req.body;
 
     // Validate segment exists
     const segment = await Segment.findById(segmentId);
     if (!segment) return res.status(404).json({ error: "Segment not found" });
 
-    // Get customers for the segment — let's simulate by fetching customers matching conditions
-    const customers = await Customer.find({});
+    // Get customers for the segment — simulate this for now (you can later filter)
+    const customers = await Customer.find({}); // Or match actual segment logic
 
-    // Generate AI messages
-    const messagesUsed = await generateAIMessages(campaignObjective);
-
-    // Simulate message sending & delivery status for each customer
+    // Simulate delivery per customer
     const messageStatus = customers.map((cust) => {
-      const deliveryStatus = simulateDeliveryStatus();
+      const personalizedMessage = selectedMessage.replace(
+        /\[NAME\]/g,
+        cust.name || "friend"
+      );
+
       return {
         customerId: cust._id,
-        deliveryStatus,
-        success: deliveryStatus === "SENT",
+        deliveryStatus: "PENDING",
+        success: false,
         timestamp: new Date(),
-        messageText:
-          messagesUsed[Math.floor(Math.random() * messagesUsed.length)],
+        messageText: personalizedMessage, // what user picked from AI options
       };
     });
 
@@ -165,23 +163,44 @@ router.post("/:segmentId/addCampaign", async (req, res) => {
     ).length;
     const failedCount = messageStatus.length - sentCount;
 
-    // Save campaign
-    const campaign = new Campaign({
+    const campaign = new CommunicationLog({
       segmentId,
       campaignObjective,
-      messagesUsed,
       createdBy,
+      messagesUsed, // all 4 suggestions
       sentCount,
       failedCount,
       previewCount: 0,
       messageStatus,
     });
-
+    console.log("REQ.BODY:", req.body);
+    console.log("selectedMessage:", selectedMessage);
     await campaign.save();
+
+    try {
+      await axios.post("http://localhost:5000/vendor/send-message", {
+        messages: messageStatus.map((msg) => ({
+          customerId: msg.customerId,
+          campaignId: campaign._id, // this line matters!
+          messageText: msg.messageText,
+        })),
+      });
+    } catch (err) {
+      console.warn("Vendor API failed:", err.message);
+      if (err.response) {
+        console.warn("Response data:", err.response.data);
+        console.warn("Status code:", err.response.status);
+      } else if (err.request) {
+        console.warn("No response received from vendor:", err.request);
+      } else {
+        console.warn("Axios config error:", err.message);
+      }
+    }
 
     res.status(201).json(campaign);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error.message);
+    res.status(500).json({ error: "Failed to create campaign" });
   }
 });
 module.exports = router;

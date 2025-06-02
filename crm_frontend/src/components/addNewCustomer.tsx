@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import {
   TextField,
   Button,
@@ -10,7 +10,7 @@ import {
   Radio, RadioGroup, FormControlLabel, FormLabel,
 } from "@mui/material";
 
-function AddNewCustomer({ categories }: { categories: string[] }) {
+function AddNewCustomer() {
   const API_BASE = import.meta.env.VITE_API_BASE;
 
   const [name, setName] = useState("");
@@ -25,26 +25,21 @@ function AddNewCustomer({ categories }: { categories: string[] }) {
   const [totalOrders, setTotalOrders] = useState<number|null>(null);
   const [lastRating, setLastRating] = useState<number|null>(null);
   const [category, setCategory] = useState("");
+const categories = [
+    "Electronics",
+    "Smartphones",
+    "Fashion",
+    "Home & Kitchen",
+    "Beauty & Personal Care",
+    "Sports & Outdoors",
+    "Books",
+    "Toys & Games",
+    "Grocery & Gourmet Food",
+    "Automotive",
+  ];
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-type user={
-  name:String,
-  email:String,
-  photo: URL,
-}
-  const [userData,setUserData]=useState<user>();
-   const loadUserData=()=>{
-      fetch(`${API_BASE}/auth/me`, { credentials: 'include',})
-          .then(res=>res.json())
-          .then(details=>{
-              setUserData(details||[]);
-          })
-           .catch((err) => console.error(err));
-    }
-     useEffect(()=>{
-      loadUserData();
-      
-    },[])
+
 
   const validateFields = () => {
     const newErrors: Record<string, string> = {};

@@ -16,7 +16,7 @@ type Customer = {
   mobile: number;
 };
 
-function AddNewOrder({ categories }: { categories: string[] }) {
+function AddNewOrder() {
     //product: { type: String },
 //   customerId: { type: ObjectId, ref: "Customer" },
 //   orderedOn: Date,
@@ -31,6 +31,19 @@ function AddNewOrder({ categories }: { categories: string[] }) {
   const [price, setPrice] = useState<number | null>(null);
   const [rating, setRating] = useState<number|null>(null);
   const [category, setCategory] = useState("");
+  const categories = [
+      "Electronics",
+      "Smartphones",
+      "Fashion",
+      "Home & Kitchen",
+      "Beauty & Personal Care",
+      "Sports & Outdoors",
+      "Books",
+      "Toys & Games",
+      "Grocery & Gourmet Food",
+      "Automotive",
+    ];
+  
 const [searchQuery, setSearchQuery] = useState("");
 const [searchResults, setSearchResults] = useState<Customer[]>([]);
 const [loading, setLoading] = useState(false);
@@ -40,19 +53,7 @@ const [loading, setLoading] = useState(false);
     email:String,
     photo: URL,
   }
-    const [userData,setUserData]=useState<user>();
-     const loadUserData=()=>{
-        fetch(`${API_BASE}/auth/me`, { credentials: 'include',})
-            .then(res=>res.json())
-            .then(details=>{
-                setUserData(details||[]);
-            })
-             .catch((err) => console.error(err));
-      }
-       useEffect(()=>{
-        loadUserData();
-        
-      },[])
+    
   const validateFields = () => {
     const newErrors: Record<string, string> = {};
     if (!product) newErrors.name = "Product Name is required";
