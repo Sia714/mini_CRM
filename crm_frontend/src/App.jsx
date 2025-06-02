@@ -6,7 +6,6 @@ import {
 
 import Dashboard from './pages/Dashboard';
 import Campaign from './components/campaign';
-
 import { useState, useEffect } from "react";
 import ProtectedRoute from "./components/protectedRoute";
 import './App.css';
@@ -15,8 +14,9 @@ import Auth from "./pages/Auth";
 import AddNewCustomer from "./components/addNewCustomer";
 import AddNewOrder from "./components/addNewOrder";
 import ViewSegments from "./components/viewSegments";
+import Profile from "./components/Profile";
 function App() {
-  const [user, setUser] = useState<false| []|null>(null);
+  const [user, setUser] = useState();
 
   useEffect(() => {
     fetch("http://localhost:5000/auth/me", {
@@ -41,18 +41,19 @@ function App() {
       path="/"
       element={
         <ProtectedRoute user={user}>
-          <Dashboard user={user} />
+          <Dashboard  />
         </ProtectedRoute>
       }
     >
       <Route index element={<SegmentCampaign />} />
       <Route path="dashboard" element={<SegmentCampaign />} />
-
       <Route path="add-customer" element={<AddNewCustomer />} />
       <Route path="add-order" element={<AddNewOrder />} />
       <Route path="view-segment" element={<ViewSegments />} />
       <Route path="campaign" element={<Campaign />} />
-      <Route path="campaign/:segmentId" element={<Campaign />} />
+      <Route path="campaign/:segmentId" element={<Campaign/>} />
+      <Route path="profile" element={<Profile/ >}/>
+
     </Route>
   </Routes>
 </Router>

@@ -11,6 +11,7 @@ const campaignSchema = new Schema(
     sentCount: Number,
     failedCount: Number,
     previewCount: Number,
+    messageSent: String,
     messageStatus: [
       {
         campaignId: { type: ObjectId, ref: "communicationLogs" },

@@ -40,12 +40,11 @@ router.get(
   })
 );
 
-router.get("/me", ensureLoggedIn, (req, res) => {
-  const user = req.user;
+router.get("/me", (req, res) => {
   res.json({
-    name: user.displayName,
-    email: user.emails[0].value,
-    photo: user.photos[0].value,
+    loggedIn: req.isAuthenticated(),
+    user: req.user || null,
+    session: req.session,
   });
 });
 router.get("/logout", (req, res) => {

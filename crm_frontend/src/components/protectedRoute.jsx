@@ -6,25 +6,19 @@ import {
   TextField,
   Button,
   Paper,
-} from '@mui/material';
+} from "@mui/material";
 
-type ProtectedRouteProps = {
-  user: any;        // null (unknown), false (not logged in), or user object
-  children: ReactNode;
-};
-
-const ProtectedRoute = ({ user, children }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ user, children }) => {
   // If user state is still `null`, we can render a loading indicator:
   if (user === null) {
-
     return (
       <Paper elevation={4} sx={{ p: 4, width: 400 }}>
         <CircularProgress></CircularProgress>
-      </Paper>);
+      </Paper>
+    );
   }
 
   // If user is explicitly false (unauthorized), redirect immediately:
- 
 
   // Otherwise: user is truthy → render the protected page
   return <>{children}</>;

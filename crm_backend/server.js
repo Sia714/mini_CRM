@@ -44,5 +44,6 @@ app.use("/vendor", require("./routes/vendor"));
 app.use("/ai", require("./routes/ai"));
 app.use("/customer", require("./routes/customer"));
 app.use("/segment", require("./routes/segment"));
+app.use("/user", require("./routes/user"));
 
 app.listen(5000, () => console.log("Server running on port 5000"));

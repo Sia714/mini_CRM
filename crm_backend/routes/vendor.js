@@ -26,7 +26,7 @@ router.post("/send-message", async (req, res) => {
 
       try {
         // Simulated callback to delivery receipt endpoint
-        await axios.post("http://localhost:5000/vendor/delivery-receipt", {
+        await axios.post("vendor/delivery-receipt", {
           customerId: msg.customerId,
           campaignId: msg.campaignId,
           status,

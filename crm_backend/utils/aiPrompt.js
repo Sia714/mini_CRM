@@ -11,6 +11,7 @@ Generate 4 short, catchy, and engaging promotional messages for a marketing camp
 - Do NOT include hardcoded offers; keep messages generic but impactful
 - If some customer details are missing (like lastVisited or averageRating), ignore them
 - Keep it within 1-2 lines per message
+- and sometimes add a small discount.
 
 🧾 Customer Conditions:
 ${JSON.stringify(conditions, null, 2)}

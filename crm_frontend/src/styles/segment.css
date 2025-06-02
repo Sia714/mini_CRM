@@ -57,11 +57,13 @@ h4{
   min-width: 400px;
   min-height: 200px;
 }
-
+.draggable-box{
+  margin-top: 10px;
+}
 .dropped-items {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 5px;
   margin-top: 10px;
 }
 .MuiTableRow-root:nth-of-type(odd) {

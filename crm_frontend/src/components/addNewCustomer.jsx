@@ -7,25 +7,28 @@ import {
   Typography,
   Container,
   Paper,
-  Radio, RadioGroup, FormControlLabel, FormLabel,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
 } from "@mui/material";
 
 function AddNewCustomer() {
   const API_BASE = import.meta.env.VITE_API_BASE;
 
   const [name, setName] = useState("");
-  const [mobile, setMobile] = useState<string>("");
+  const [mobile, setMobile] = useState  ("");
   const [address, setAddress] = useState("");
   const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
-  const [isActive, setIsActive] = useState<boolean | null>(null);
-  const [lastVisited, setLastVisited] = useState<string>(""); // store as yyyy-mm-dd string
-  const [visits, setVisits] = useState<number|null>(null);
-  const [totalSpent, setTotalSpent] = useState<number|null>(null);
-  const [totalOrders, setTotalOrders] = useState<number|null>(null);
-  const [lastRating, setLastRating] = useState<number|null>(null);
+  const [isActive, setIsActive] = useState (null);
+  const [lastVisited, setLastVisited] = useState  (""); // store as yyyy-mm-dd string
+  const [visits, setVisits] = useState(null);
+  const [totalSpent, setTotalSpent] = useState  (null);
+  const [totalOrders, setTotalOrders] = useState(null);
+  const [lastRating, setLastRating] = useState(null);
   const [category, setCategory] = useState("");
-const categories = [
+  const categories = [
     "Electronics",
     "Smartphones",
     "Fashion",
@@ -38,26 +41,27 @@ const categories = [
     "Automotive",
   ];
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
+  const [errors, setErrors] = useState({});
 
   const validateFields = () => {
-    const newErrors: Record<string, string> = {};
+    const newErrors = {};
     if (!name) newErrors.name = "Name is required";
-    if (!mobile){
-         newErrors.mobile = "Mobile number is required"; 
-    }else if (!/^\d{10}$/.test(mobile)) {
-        newErrors.mobile = "Mobile number must be exactly 10 digits";
+    if (!mobile) {
+      newErrors.mobile = "Mobile number is required";
+    } else if (!/^\d{10}$/.test(mobile)) {
+      newErrors.mobile = "Mobile number must be exactly 10 digits";
     }
     if (!email) newErrors.email = "Email is required";
     if (!/^\S+@\S+\.\S+$/.test(email)) newErrors.email = "Invalid email format";
     if (!address) newErrors.address = "Address is required";
     if (isActive === null) newErrors.isActive = "Select if active or not";
-    
-    if(totalOrders){
-      setTotalOrders(Math.floor(totalOrders))}
-        if(visits){
-      setVisits(Math.floor(visits))}
+
+    if (totalOrders) {
+      setTotalOrders(Math.floor(totalOrders));
+    }
+    if (visits) {
+      setVisits(Math.floor(visits));
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -67,7 +71,7 @@ const categories = [
 
     try {
       const response = await fetch(`${API_BASE}/customer/addCustomer`, {
-        credentials: 'include',
+        credentials: "include",
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +82,7 @@ const categories = [
           gender,
           email,
           fullAddress: address,
-          lastVisited,  
+          lastVisited,
           visits,
           isActive,
           totalSpent,
@@ -111,8 +115,7 @@ const categories = [
   };
 
   return (
-    
-    <Container maxWidth="md">
+    <Container maxWidth="md" sx={{ m: 5 }}>
       <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
         <Typography variant="h5" gutterBottom>
           Add New Customer
@@ -150,42 +153,49 @@ const categories = [
             size="small"
             label="Address"
             fullWidth
-            value={address?? ""}
+            value={address ?? ""}
             onChange={(e) => setAddress(e.target.value)}
             error={!!errors.address}
             helperText={errors.address}
           />
-            <FormLabel>Gender</FormLabel>
-            <RadioGroup
+          <FormLabel>Gender</FormLabel>
+          <RadioGroup
             row
             value={gender}
             onChange={(e) => setGender(e.target.value)}
-            >
+          >
             <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel value="Female" control={<Radio />} label="Female" />
-            <FormControlLabel value="None" control={<Radio />} label="Prefer not to say" />
-            </RadioGroup>
-         
-          
+            <FormControlLabel
+              value="Female"
+              control={<Radio />}
+              label="Female"
+            />
+            <FormControlLabel
+              value="None"
+              control={<Radio />}
+              label="Prefer not to say"
+            />
+          </RadioGroup>
+
           <TextField
             size="small"
             label="Total Orders"
             fullWidth
             type="number"
-            InputProps={{ inputProps: { min: 0} }}
+            InputProps={{ inputProps: { min: 0 } }}
             value={visits ?? ""}
             onChange={(e) => setVisits(Number(e.target.value))}
           />
-            <TextField
-              size="small"
-              label="Last Visited"
-              type="date"
-              value={lastVisited ?? ""}
-              onChange={(e) => setLastVisited(e.target.value)}
-              InputLabelProps={{
-                shrink: true, // keeps label visible when date is picked
-              }}
-            />
+          <TextField
+            size="small"
+            label="Last Visited"
+            type="date"
+            value={lastVisited ?? ""}
+            onChange={(e) => setLastVisited(e.target.value)}
+            InputLabelProps={{
+              shrink: true, // keeps label visible when date is picked
+            }}
+          />
           <TextField
             size="small"
             label="Total Spent"
@@ -200,11 +210,11 @@ const categories = [
             label="Total Orders"
             fullWidth
             type="number"
-            InputProps={{ inputProps: { min: 0} }}
+            InputProps={{ inputProps: { min: 0 } }}
             value={totalOrders ?? ""}
             onChange={(e) => setTotalOrders(Number(e.target.value))}
           />
-         
+
           <TextField
             size="small"
             label="Last Rating"
@@ -214,7 +224,7 @@ const categories = [
             value={lastRating ?? ""}
             onChange={(e) => setLastRating(Number(e.target.value))}
           />
-           <TextField
+          <TextField
             select
             size="small"
             label="Category"
@@ -230,25 +240,30 @@ const categories = [
             ))}
           </TextField>
           <FormLabel>Customer is</FormLabel>
-            <RadioGroup
+          <RadioGroup
             row
             value={isActive === null ? "" : String(isActive)}
             onChange={(e) => setIsActive(e.target.value === "true")}
-            >
+          >
             <FormControlLabel value="true" control={<Radio />} label="Active" />
-            <FormControlLabel value="false" control={<Radio />} label="Inactive" />
-            </RadioGroup>
-            {errors.isActive && (
+            <FormControlLabel
+              value="false"
+              control={<Radio />}
+              label="Inactive"
+            />
+          </RadioGroup>
+          {errors.isActive && (
             <Typography color="error" variant="caption">
-                {errors.isActive}
+              {errors.isActive}
             </Typography>
-            )}
+          )}
           <Button variant="contained" onClick={addCustomer}>
             Add Customer
           </Button>
         </Box>
       </Paper>
     </Container>
-)}
+  );
+}
 
 export default AddNewCustomer;

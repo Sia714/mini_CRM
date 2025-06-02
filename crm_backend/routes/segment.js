@@ -10,14 +10,6 @@ const segment = require("../models/segment");
 
 // router.use(ensureLoggedIn);
 
-router.get("/debug", (req, res) => {
-  res.json({
-    loggedIn: req.isAuthenticated(),
-    user: req.user || null,
-    session: req.session,
-  });
-});
-
 router.get("/getAllSegments", async (req, res) => {
   try {
     const segments = await Segment.find();
@@ -27,25 +19,29 @@ router.get("/getAllSegments", async (req, res) => {
     res.status(500).json({ error: "Failed to compute audience" });
   }
 });
+
 function buildMongoQueryFromRules(rules) {
-  let mongoQuery = {};
-  let tempGroup = [];
+  const stack = [];
+  let currentLogic = "$and"; // default logic
+  let currentGroup = [];
 
   for (let rule of rules) {
     if (rule.logic) {
-      if (tempGroup.length > 0) {
-        mongoQuery = { [`$${rule.logic.toLowerCase()}`]: [...tempGroup] };
-        tempGroup = [];
+      // Push previous group to stack
+      if (currentGroup.length > 0) {
+        stack.push({ [currentLogic]: [...currentGroup] });
+        currentGroup = [];
       }
+
+      currentLogic = `$${rule.logic.toLowerCase()}`;
     } else {
       let val;
-
       if (rule.value === "true") val = true;
       else if (rule.value === "false") val = false;
       else if (!isNaN(Number(rule.value))) val = Number(rule.value);
       else val = rule.value;
 
-      tempGroup.push({
+      currentGroup.push({
         [rule.field]: {
           [`$${convertOp(rule.operator)}`]: val,
         },
@@ -53,14 +49,17 @@ function buildMongoQueryFromRules(rules) {
     }
   }
 
-  if (
-    (!mongoQuery || Object.keys(mongoQuery).length === 0) &&
-    tempGroup.length
-  ) {
-    mongoQuery = { $and: tempGroup };
+  // Push remaining group
+  if (currentGroup.length > 0) {
+    stack.push({ [currentLogic]: [...currentGroup] });
   }
 
-  return mongoQuery;
+  // Merge all groups with $and
+  if (stack.length === 1) {
+    return stack[0];
+  } else {
+    return { $and: stack };
+  }
 }
 
 router.get("/preview", async (req, res) => {
@@ -129,20 +128,22 @@ router.get("/:segmentId", async (req, res) => {
   }
 });
 
-router.post("/:segmentId/", async (req, res) => {
+router.post("/:segmentId/addCampaign", async (req, res) => {
   try {
     const { segmentId } = req.params;
     const { campaignObjective, createdBy, selectedMessage, messagesUsed } =
       req.body;
 
-    // Validate segment exists
+    // ✅ Validate and fetch segment
     const segment = await Segment.findById(segmentId);
     if (!segment) return res.status(404).json({ error: "Segment not found" });
 
-    // Get customers for the segment — simulate this for now (you can later filter)
-    const customers = await Customer.find({}); // Or match actual segment logic
+    // ✅ Use segment conditions to filter customers
+    const rules = segment.conditions;
+    const mongoQuery = buildMongoQueryFromRules(rules);
+    const customers = await Customer.find(mongoQuery);
 
-    // Simulate delivery per customer
+    // 🛠️ Generate messages for matching customers only
     const messageStatus = customers.map((cust) => {
       const personalizedMessage = selectedMessage.replace(
         /\[NAME\]/g,
@@ -154,7 +155,7 @@ router.post("/:segmentId/", async (req, res) => {
         deliveryStatus: "PENDING",
         success: false,
         timestamp: new Date(),
-        messageText: personalizedMessage, // what user picked from AI options
+        messageText: personalizedMessage,
       };
     });
 
@@ -167,21 +168,22 @@ router.post("/:segmentId/", async (req, res) => {
       segmentId,
       campaignObjective,
       createdBy,
-      messagesUsed, // all 4 suggestions
+      messagesUsed,
       sentCount,
       failedCount,
-      previewCount: 0,
+      messageSent: selectedMessage,
+      previewCount: customers.length,
       messageStatus,
     });
-    console.log("REQ.BODY:", req.body);
-    console.log("selectedMessage:", selectedMessage);
+
     await campaign.save();
 
+    // ✅ Trigger vendor API
     try {
       await axios.post("http://localhost:5000/vendor/send-message", {
         messages: messageStatus.map((msg) => ({
           customerId: msg.customerId,
-          campaignId: campaign._id, // this line matters!
+          campaignId: campaign._id,
           messageText: msg.messageText,
         })),
       });
@@ -203,4 +205,5 @@ router.post("/:segmentId/", async (req, res) => {
     res.status(500).json({ error: "Failed to create campaign" });
   }
 });
+
 module.exports = router;
