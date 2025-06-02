@@ -13,7 +13,7 @@ app.set("trust proxy", 1);
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://mini-crm-umber.vercel.app", // your React frontend URL
+    origin: "https://mini-crm-git-master-sayjans-projects.vercel.app", // your React frontend URL
     credentials: true,
   })
 );
