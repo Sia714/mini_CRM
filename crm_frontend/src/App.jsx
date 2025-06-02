@@ -10,7 +10,6 @@ import { useState, useEffect } from "react";
 import ProtectedRoute from "./components/protectedRoute";
 import './App.css';
 import SegmentCampaign from "./components/segmentCampaign";
-import Auth from "./pages/Auth";
 import AddNewCustomer from "./components/addNewCustomer";
 import AddNewOrder from "./components/addNewOrder";
 import ViewSegments from "./components/viewSegments";
