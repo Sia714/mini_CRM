@@ -12,7 +12,7 @@ dotenv.config();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173", // your React frontend URL
+    origin: "https://mini-crm-umber.vercel.app/", // your React frontend URL
     credentials: true,
   })
 );
