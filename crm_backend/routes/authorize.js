@@ -1,3 +1,4 @@
+//routes/authorize.js
 const express = require("express");
 const passport = require("passport");
 const session = require("express-session");
@@ -9,6 +10,10 @@ passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
 // Set up Google OAuth strategy
+console.log(
+  "Using redirect URI:",
+  `${process.env.BACKEND_URL}/auth/google/callback`
+);
 passport.use(
   new Strategy(
     {
