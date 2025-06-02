@@ -9,7 +9,7 @@ const ensureLoggedIn = require("./middlewares/ensureLoggedIn");
 const axios = require("axios");
 const app = express();
 dotenv.config();
-
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(
   cors({
@@ -20,12 +20,12 @@ app.use(
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "your_secret_key", // move to .env
+    secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
-      sameSite: "lax",
+      secure: true, // REQUIRED on https domains (Render)
+      sameSite: "none", // REQUIRED for cross-site cookies
       maxAge: 24 * 60 * 60 * 1000,
     },
   })

@@ -45,6 +45,7 @@ router.get(
 );
 
 router.get("/me", (req, res) => {
+  console.log("SESSION:", req.session);
   res.json({
     loggedIn: req.isAuthenticated(),
     user: req.user || null,
