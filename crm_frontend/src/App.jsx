@@ -17,9 +17,11 @@ import ViewSegments from "./components/viewSegments";
 import Profile from "./components/profile";
 function App() {
   const [user, setUser] = useState();
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 
   useEffect(() => {
-    fetch("http://localhost:5000/auth/me", {
+    fetch(`${API_BASE}/auth/me`, {
       credentials: "include",
     })
       .then((res) => {
@@ -33,8 +35,7 @@ function App() {
   return (
       <Router>
   <Routes>
-    {/* Login/Auth Route */}
-    <Route path="/auth" element={<Auth />} />
+   
 
     {/* Protected Dashboard Route */}
     <Route
