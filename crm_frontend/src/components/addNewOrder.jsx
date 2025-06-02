@@ -12,12 +12,7 @@ import {
 } from "@mui/material";
 
 function AddNewOrder() {
-  //product: { type: String },
-  //   customerId: { type: ObjectId, ref: "Customer" },
-  //   orderedOn: Date,
-  //   price: Number,
-  //   rating: Number,
-  //   category: String,
+
   const API_BASE = import.meta.env.VITE_API_BASE;
 
   const [product, setProduct] = useState("");

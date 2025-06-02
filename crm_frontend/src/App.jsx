@@ -14,7 +14,7 @@ import Auth from "./pages/Auth";
 import AddNewCustomer from "./components/addNewCustomer";
 import AddNewOrder from "./components/addNewOrder";
 import ViewSegments from "./components/viewSegments";
-import Profile from "./components/Profile";
+import Profile from "./components/profile";
 function App() {
   const [user, setUser] = useState();
 
