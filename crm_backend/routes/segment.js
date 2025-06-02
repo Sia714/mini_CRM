@@ -5,10 +5,7 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const Segment = require("../models/segment");
 const CommunicationLog = require("../models/communicationLog");
-const ensureLoggedIn = require("../middlewares/ensureLoggedIn");
 const segment = require("../models/segment");
-
-// router.use(ensureLoggedIn);
 
 router.get("/getAllSegments", async (req, res) => {
   try {

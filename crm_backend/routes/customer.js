@@ -2,9 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Customer = require("../models/customer");
 const Order = require("../models/order");
-const ensureLoggedIn = require("../middlewares/ensureLoggedIn");
-
-router.use(ensureLoggedIn);
 
 router.post("/addCustomer", async (req, res) => {
   const data = req.body;

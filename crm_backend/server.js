@@ -12,7 +12,7 @@ dotenv.config();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://mini-crm-umber.vercel.app/", // your React frontend URL
+    origin: "https://mini-crm-umber.vercel.app", // your React frontend URL
     credentials: true,
   })
 );
@@ -39,7 +39,7 @@ mongoose
   .catch((err) => console.log("ERROR:", err));
 
 app.use("/auth", require("./routes/authorize"));
-// app.use(ensureLoggedIn);
+app.use(ensureLoggedIn);
 app.use("/vendor", require("./routes/vendor"));
 app.use("/ai", require("./routes/ai"));
 app.use("/customer", require("./routes/customer"));

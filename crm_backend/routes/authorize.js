@@ -3,7 +3,6 @@ const passport = require("passport");
 const session = require("express-session");
 const router = express.Router();
 const { Strategy } = require("passport-google-oauth20");
-const ensureLoggedIn = require("../middlewares/ensureLoggedIn");
 
 // Serialize user to session
 passport.serializeUser((user, done) => done(null, user));
