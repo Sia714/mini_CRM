@@ -16,7 +16,6 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
-import { createTheme, styled } from "@mui/material/styles";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SegmentIcon from "@mui/icons-material/Segment";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
@@ -139,7 +138,6 @@ function Dashboard() {
       <AppProvider
         navigation={getNavigation(userData)}
         router={router}
-        theme={demoTheme}
       >
         <Box
           sx={{
