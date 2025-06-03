@@ -63,7 +63,7 @@ router.get("/preview", async (req, res) => {
   try {
     const rules = JSON.parse(decodeURIComponent(req.query.rules));
     const mongoQuery = buildMongoQueryFromRules(rules);
-    const customers = await Customer.find(mongoQuery).limit(20); // or whatever your limit is
+    const customers = await Customer.find(mongoQuery).limit(30);
     res.json({ customers });
   } catch (err) {
     console.error(err);
