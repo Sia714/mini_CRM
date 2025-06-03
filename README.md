@@ -7,7 +7,7 @@ Mini CRM is a full-featured Customer Relationship Management platform built with
 ##  Features
 
 -  **Customer Segmentation** with drag-and-drop rule builder (AND/OR logic)
--  **Campaign Creation** with AI-powered message suggestions (OpenRouter GPT-4o-mini)
+-  **Campaign Creation** with AI-powered message suggestions, which are based on Segment Info (OpenRouter GPT-4o-mini)
 -  **Simulated Vendor API** for message delivery + async receipt handling
 -  **Delivery Metrics** (sent/failed counts auto-updated)
 -  **Google OAuth 2.0 Authentication**
