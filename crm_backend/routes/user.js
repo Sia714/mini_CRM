@@ -12,7 +12,7 @@ router.get("/activity", async (req, res) => {
     if (!user) return res.status(401).json({ error: "Unauthorized" });
 
     const [campaigns, segments] = await Promise.all([
-      communicationLog.find({ createdBy: user.emails[0]?.value }),
+      Campaign.find({ createdBy: user.emails[0]?.value }),
       Segment.find({ createdBy: user.emails[0]?.value }),
     ]);
 
