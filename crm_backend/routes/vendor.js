@@ -2,14 +2,14 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
-const Campaign = require("../models/communicationLog"); // adjust path if needed
+const Campaign = require("../models/communicationLog");
 
 // Helper: 90% success simulation
 function simulateDeliveryStatus() {
   return Math.random() < 0.9 ? "SENT" : "FAILED";
 }
 
-// POST /vendor/send-message
+// POST /send message
 router.post("/send-message", async (req, res) => {
   const { messages } = req.body;
 
@@ -26,7 +26,7 @@ router.post("/send-message", async (req, res) => {
 
       try {
         // Simulated callback to delivery receipt endpoint
-        await axios.post("vendor/delivery-receipt", {
+        await axios.post(`${BACKEND_URL}/vendor/delivery-receipt`, {
           customerId: msg.customerId,
           campaignId: msg.campaignId,
           status,
