@@ -29,7 +29,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const getNavigation = (user) => [
   { kind: "header", title: "Main" },
-  { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
+  { segment: "", title: "Create Segments", icon: <DashboardIcon /> },
   ...(user
     ? [
  {
