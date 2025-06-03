@@ -118,7 +118,7 @@ function Dashboard() {
 
   return (
     <>
-      <Dialog open={isLoggedIn}>
+      <Dialog open={!isLoggedIn}>
         <DialogTitle>Login required</DialogTitle>
         <DialogContent>
           <List>
