@@ -32,19 +32,20 @@ const getNavigation = (user) => [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   ...(user
     ? [
-        {
-          segment: "add-customer",
-          title: "Add Customer",
-          icon: <PersonAddIcon />,
-        },
-        { segment: "add-order", 
-          title: "Add Order", 
-          icon: <ShoppingBagIcon /> },
-        {
+ {
           segment: "view-segment",
           title: "View Segments",
           icon: <SegmentIcon />,
         },
+        {
+          segment: "add-customer",
+          title: "Manage Customers",
+          icon: <PersonAddIcon />,
+        },
+        { segment: "add-order", 
+          title: "Manage Orders", 
+          icon: <ShoppingBagIcon /> },
+       
         {
           segment: "campaign",
           title: "Campaign History",
@@ -56,6 +57,7 @@ const getNavigation = (user) => [
       ]
     : []),
 ];
+
 
 const demoTheme =
   createTheme();

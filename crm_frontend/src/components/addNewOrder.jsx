@@ -9,12 +9,15 @@ import {
   Paper,
   Autocomplete,
   CircularProgress,
+   Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow,  Grid
 } from "@mui/material";
 
 function AddNewOrder() {
 
   const API_BASE = import.meta.env.VITE_API_BASE;
 
+   const [showForm, setShowForm] = useState(false);
   const [product, setProduct] = useState("");
   const [customerId, setCustomerId] = useState ("");
   const [orderedOn, setOrderedOn] = useState (""); // store as yyyy-mm-dd string
@@ -37,7 +40,22 @@ function AddNewOrder() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [orders, setOrders] = useState([]);
+
   const [errors, setErrors] = useState({});
+
+   const fetchOrders=async()=>{
+       try {
+         fetch(`${API_BASE}/user/orders`, {
+          credentials: "include",
+        }).then((res)=>res.json())
+        .then((details)=>{setOrders(details);})
+        .catch((err)=>{console.log(err);})
+       
+      }catch(err){console.log(err);}
+    };
+  
+    useEffect(()=>{fetchOrders()},[])
 
   const validateFields = () => {
     const newErrors = {};
@@ -112,97 +130,173 @@ function AddNewOrder() {
   };
 
   return (
-    <Container maxWidth="md">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          Add New Order
-        </Typography>
-        <Box display="flex" flexDirection="column" gap={2}>
-          <TextField
-            size="small"
-            label="Product Name"
-            fullWidth
-            value={product}
-            onChange={(e) => setProduct(e.target.value)}
-            error={!!errors.product}
-            helperText={errors.product}
-          />
-          <Autocomplete
-            options={searchResults || []}
-            getOptionLabel={(option) => `${option.name} - ${option.mobile}`}
-            onInputChange={(e, value) => setSearchQuery(value)}
-            onChange={(e, value) => setCustomerId(value?._id || "")}
-            loading={loading}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Select Customer"
-                variant="outlined"
-                size="small"
-                fullWidth
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {loading ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-              />
-            )}
-          />
-          <TextField
-            size="small"
-            label="Ordered on"
-            type="date"
-            value={orderedOn ?? ""}
-            onChange={(e) => setOrderedOn(e.target.value)}
-            InputLabelProps={{
-              shrink: true, // keeps label visible when date is picked
-            }}
-          />
-          <TextField
-            size="small"
-            label="Price"
-            fullWidth
-            type="number"
-            value={price ?? ""}
-            onChange={(e) => setPrice(Number(e.target.value))}
-          />
-          <TextField
-            size="small"
-            label="Rating"
-            fullWidth
-            type="number"
-            value={rating ?? ""}
-            onChange={(e) => setRating(Number(e.target.value))}
-          />
-
-          <TextField
-            select
-            size="small"
-            label="Category"
-            value={category ?? ""}
-            onChange={(e) => setCategory(e.target.value)}
-            fullWidth
-            variant="outlined"
+    <>
+     <Container maxWidth="md" sx={{ mb: 5 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mt={4}>
+          {showForm ? "" :
+          <Button
+            variant="contained"
+            onClick={() => setShowForm(true)}
           >
-            {categories.map((cat, ind) => (
-              <MenuItem key={ind} value={cat}>
-                {cat}
-              </MenuItem>
-            ))}
-          </TextField>
+                          + Add New Order
 
-          <Button variant="contained" onClick={addOrder}>
-            Add Order
-          </Button>
+          </Button>}
         </Box>
-      </Paper>
-    </Container>
+    <Container maxWidth="md" sx={{ mb: 5 }}>
+
+        {showForm && (
+          <Paper elevation={3} sx={{ p: 4, mt: 3,   boxShadow:10}}>
+            <Typography variant="h6" gutterBottom>
+              Add New Order
+            </Typography>
+            <Box display="flex" flexDirection="column" gap={2}>
+              <TextField
+                size="small"
+                label="Product Name"
+                fullWidth
+                value={product}
+                onChange={(e) => setProduct(e.target.value)}
+                error={!!errors.product}
+                helperText={errors.product}
+              />
+
+              <Autocomplete
+                options={searchResults || []}
+                getOptionLabel={(option) => `${option.name} - ${option.mobile}`}
+                onInputChange={(e, value) => setSearchQuery(value)}
+                onChange={(e, value) => setCustomerId(value?._id || "")}
+                loading={loading}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Customer"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {loading ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                  />
+                )}
+              />
+
+              <TextField
+                size="small"
+                label="Ordered on"
+                type="date"
+                value={orderedOn ?? ""}
+                onChange={(e) => setOrderedOn(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+
+              <TextField
+                size="small"
+                label="Price"
+                fullWidth
+                type="number"
+                value={price ?? ""}
+                onChange={(e) => setPrice(Number(e.target.value))}
+              />
+
+              <TextField
+                size="small"
+                label="Rating"
+                fullWidth
+                type="number"
+                value={rating ?? ""}
+                onChange={(e) => setRating(Number(e.target.value))}
+              />
+
+              <TextField
+                select
+                size="small"
+                label="Category"
+                value={category ?? ""}
+                onChange={(e) => setCategory(e.target.value)}
+                fullWidth
+              >
+                {categories.map((cat, ind) => (
+                  <MenuItem key={ind} value={cat}>
+                    {cat}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+<Box mt={4}>
+  <Grid container spacing={2}>
+    <Grid size={{xs:6}}>
+      <Button
+        fullWidth
+        variant="contained"
+        onClick={addOrder}
+      >
+        Add Order
+      </Button>
+    </Grid>
+    <Grid size={{xs:6}}>
+      <Button
+        fullWidth
+        variant="contained"
+        color="secondary"
+        onClick={() => setShowForm(false)}
+      >
+        Close Form
+      </Button>
+    </Grid>
+  </Grid>
+</Box>
+
+             
+            </Box>
+          </Paper>
+        )}
+
+</Container>
+
+        <Paper  sx={{ p: 2 , boxShadow:10}}>
+            <Typography variant="h6" sx={{ p: 2 }}>
+        All Orders
+      </Typography>
+        <TableContainer component={Paper} sx={{ mt: 2, p:2,boxShadow:"6" }}>
+    
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell>Product</TableCell>
+            <TableCell>Category</TableCell>
+            <TableCell>Ordered By</TableCell>
+            <TableCell>Ordered On</TableCell>
+            <TableCell>Price</TableCell>
+            <TableCell>Rating</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {orders.map((order, index) => (
+            <TableRow key={order._id || index}>
+              <TableCell>{order.product}</TableCell>
+              <TableCell>{order.category}</TableCell>
+              <TableCell>{order.customerId?.name || "N/A"}</TableCell>
+
+              <TableCell>{order.orderedOn ? new Date(order.orderedOn).toLocaleDateString() : "-"}</TableCell>
+              <TableCell>₹{order.price}</TableCell>
+              <TableCell>{order.rating ?? "-"}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Paper>
+  </Container>
+</>
+
   );
 }
 

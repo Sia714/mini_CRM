@@ -4,7 +4,7 @@ const { ObjectId } = mongoose.Schema.Types;
 
 const orderSchema = new mongoose.Schema({
   product: { type: String },
-  customerId: { type: ObjectId, ref: "Customer" },
+  customerId: { type: ObjectId, ref: "Customers" },
   orderedOn: Date,
   price: Number,
   rating: Number,
