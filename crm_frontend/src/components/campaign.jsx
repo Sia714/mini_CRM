@@ -103,12 +103,11 @@ function Campaign() {
     const prompt = JSON.stringify({
       conditions: selectedSegment?.conditions,
       segmentId: selectedSegmentId,
-      createdBy: userData?.emails[0]?.value,
+      createdBy:userData?.emails?.[0]?.value,
       messagesUsed: aiMessages,
       campaignObjective: campaignObjective, // or use original objective if saved
       selectedMessage: selectedMessage,
     });
-    console.log(prompt);
     fetch(`${API_BASE}/segment/${selectedSegmentId}/addCampaign`, {
       credentials: "include",
       method: "POST",

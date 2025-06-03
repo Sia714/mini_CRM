@@ -110,7 +110,6 @@ function AddNewCustomer() {
       });
 
       const res = await response.json();
-      console.log("Customer added:", res);
       alert("Customer added successfully!");
 
       // Reset form

@@ -113,7 +113,6 @@ function AddNewOrder() {
       });
 
       const res = await response.json();
-      console.log("Order added:", res);
       alert("Order added successfully!");
 
       // Reset form

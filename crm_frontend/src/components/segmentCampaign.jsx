@@ -334,7 +334,6 @@ function SegmentCampaign() {
     }
     for (let i = 0; i < workspace.length; i++) {
       const token = workspace[i];
-      console.log("TOKEN:", token);
       if (["AND", "OR"].includes(token.label.toString())) {
         result.push({ logic: token });
       } else if (
@@ -426,7 +425,6 @@ function SegmentCampaign() {
     e.preventDefault();
   };
   const removeItem = (index) => {
-    console.log(index + " " + (workspace.length - 1));
     if (index != workspace.length - 1) {
       alert("can't remove middle Items");
       return;
@@ -474,7 +472,6 @@ function SegmentCampaign() {
       });
 
       const queryStr = encodeURIComponent(JSON.stringify(querySeg));
-      console.log(querySeg);
       fetch(`${API_BASE}/segment/preview?rules=${queryStr}`, {
         credentials: "include",
       })
@@ -498,7 +495,6 @@ function SegmentCampaign() {
     if (!payload) {
       return;
     }
-    console.log("Parsed payload:", payload);
 
     const segName = prompt("Please enter a segment Name");
     if(!segName){return;}
@@ -514,14 +510,13 @@ function SegmentCampaign() {
               : rule.value,
         };
       });
-      console.log(querySeg);
       fetch(`${API_BASE}/segment/`, {
         credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: segName,
-          createdBy: userData?.emails[0]?.value,
+          createdBy: userData?.emails?.[0]?.value,
           rules: querySeg,
         }),
       })

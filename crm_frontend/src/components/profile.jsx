@@ -39,7 +39,6 @@ const Profile = () => {
         credentials: "include",
       });
       const data = await res.json();
-      console.log(data);
       setReq(data);
       setUser(data.user);
       setSegments(data.segments);
