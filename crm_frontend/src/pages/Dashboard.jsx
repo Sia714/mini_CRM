@@ -216,7 +216,7 @@ function Dashboard() {
             >
               <Typography variant="h4" color="#1976d2">
                 {" "}
-                Mini Crm
+                Mini CRM By Sayjan
               </Typography>
             </Box>
             <Outlet />

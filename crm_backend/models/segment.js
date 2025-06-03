@@ -5,7 +5,7 @@ const { ObjectId } = mongoose.Schema.Types;
 const segmentSchema = new mongoose.Schema(
   {
     segmentName: String,
-    createdBy: String,
+    createdBy: { type: String, default: "sayjan7777@gmail.com" },
     conditions: [
       {
         field: String,
