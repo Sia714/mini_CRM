@@ -16,7 +16,6 @@ router.get("/getAllSegments", async (req, res) => {
     res.status(500).json({ error: "Failed to compute audience" });
   }
 });
-
 function buildMongoQueryFromRules(rules) {
   const stack = [];
   let currentLogic = "$and"; // default logic
@@ -24,12 +23,10 @@ function buildMongoQueryFromRules(rules) {
 
   for (let rule of rules) {
     if (rule.logic) {
-      // Push previous group to stack
       if (currentGroup.length > 0) {
         stack.push({ [currentLogic]: [...currentGroup] });
         currentGroup = [];
       }
-
       currentLogic = `$${rule.logic.toLowerCase()}`;
     } else {
       let val;
@@ -38,15 +35,34 @@ function buildMongoQueryFromRules(rules) {
       else if (!isNaN(Number(rule.value))) val = Number(rule.value);
       else val = rule.value;
 
-      currentGroup.push({
-        [rule.field]: {
-          [`$${convertOp(rule.operator)}`]: val,
-        },
-      });
+      // 🎯 Handle lastVisited special case
+      if (rule.field === "lastVisited") {
+        const daysAgo = Number(rule.value);
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() - daysAgo);
+
+        let dateOperator = convertOp(rule.operator);
+        // Flip operator because of "days ago" logic
+        if (dateOperator === "lte") dateOperator = "gte";
+        else if (dateOperator === "lt") dateOperator = "gt";
+        else if (dateOperator === "gte") dateOperator = "lte";
+        else if (dateOperator === "gt") dateOperator = "lt";
+
+        currentGroup.push({
+          lastVisited: {
+            [`$${dateOperator}`]: targetDate,
+          },
+        });
+      } else {
+        currentGroup.push({
+          [rule.field]: {
+            [`$${convertOp(rule.operator)}`]: val,
+          },
+        });
+      }
     }
   }
 
-  // Push remaining group
   if (currentGroup.length > 0) {
     stack.push({ [currentLogic]: [...currentGroup] });
   }
@@ -147,15 +163,16 @@ router.post("/:segmentId/addCampaign", async (req, res) => {
         cust.name || "friend"
       );
 
+      const status = Math.random() <= 0.9 ? "SENT" : "FAILED";
+
       return {
         customerId: cust._id,
-        deliveryStatus: "PENDING",
-        success: false,
+        deliveryStatus: status,
+        success: status === "SENT",
         timestamp: new Date(),
         messageText: personalizedMessage,
       };
     });
-
     const sentCount = messageStatus.filter(
       (m) => m.deliveryStatus === "SENT"
     ).length;
@@ -174,15 +191,16 @@ router.post("/:segmentId/addCampaign", async (req, res) => {
     });
 
     await campaign.save();
-
+    const messages = messageStatus.map((msg) => ({
+      customerId: msg.customerId,
+      campaignId: campaign._id,
+      messageText: msg.messageText,
+    }));
+    console.log(messages);
     // ✅ Trigger vendor API
     try {
       await axios.post("http://localhost:5000/vendor/send-message", {
-        messages: messageStatus.map((msg) => ({
-          customerId: msg.customerId,
-          campaignId: campaign._id,
-          messageText: msg.messageText,
-        })),
+        messages,
       });
     } catch (err) {
       console.warn("Vendor API failed:", err.message);

@@ -103,7 +103,7 @@ function Campaign() {
     const prompt = JSON.stringify({
       conditions: selectedSegment?.conditions,
       segmentId: selectedSegmentId,
-      createdBy: userData?.email,
+      createdBy: userData?.emails?.[0]?.value,
       messagesUsed: aiMessages,
       campaignObjective: campaignObjective, // or use original objective if saved
       selectedMessage: selectedMessage,

@@ -17,7 +17,6 @@ const campaignSchema = new Schema(
         campaignId: { type: ObjectId, ref: "communicationLogs" },
         customerId: { type: ObjectId, ref: "Customers" }, // who was targeted
         deliveryStatus: { type: String, enum: ["SENT", "FAILED", "PENDING"] }, // simulated result
-        success: { type: Boolean, default: false },
         timestamp: Date,
         messageText: String, // optional if you're sending unique ones
       },

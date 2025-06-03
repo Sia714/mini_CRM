@@ -40,9 +40,9 @@ function App() {
     <Route
       path="/"
       element={
-        <ProtectedRoute user={user}>
+        // <ProtectedRoute user={user}>
           <Dashboard  />
-        </ProtectedRoute>
+        // </ProtectedRoute>
       }
     >
       <Route index element={<SegmentCampaign />} />

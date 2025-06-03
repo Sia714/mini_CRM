@@ -486,7 +486,8 @@ function SegmentCampaign() {
               tableRef.current.scrollIntoView({ behavior: "smooth" });
             }
           }, 200);
-        });
+        })
+        .catch((err)=>{console.error(err)});
     } catch (e) {
       console.error(e);
     }
@@ -500,6 +501,7 @@ function SegmentCampaign() {
     console.log("Parsed payload:", payload);
 
     const segName = prompt("Please enter a segment Name");
+    if(!segName){return;}
     try {
       const querySeg = payload?.map((rule) => {
         if (rule.logic) return { logic: rule.logic.label };
