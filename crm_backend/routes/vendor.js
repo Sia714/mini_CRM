@@ -9,7 +9,7 @@ function simulateDeliveryStatus() {
   return Math.random() < 0.9 ? "SENT" : "FAILED";
 }
 
-// POST /send message
+// POST /send-message – INSTANT delivery
 router.post("/send-message", async (req, res) => {
   const { messages } = req.body;
 
@@ -17,28 +17,28 @@ router.post("/send-message", async (req, res) => {
     return res.status(400).json({ error: "messages must be an array" });
   }
 
-  // Simulate async delivery (1–2 sec delay)
-  messages.forEach((msg) => {
-    const delay = Math.random() * 1000 + 500;
+  try {
+    // Send all messages instantly
+    await Promise.all(
+      messages.map(async (msg) => {
+        const status = simulateDeliveryStatus();
 
-    setTimeout(async () => {
-      const status = simulateDeliveryStatus();
-
-      try {
-        // Simulated callback to delivery receipt endpoint
         await axios.post(`${BACKEND_URL}/vendor/delivery-receipt`, {
           customerId: msg.customerId,
           campaignId: msg.campaignId,
           status,
           messageText: msg.messageText,
         });
-      } catch (err) {
-        console.error("Delivery receipt failed:", err.message);
-      }
-    }, delay);
-  });
+      })
+    );
 
-  res.json({ success: true, message: "Vendor started processing deliveries" });
+    res.json({ success: true, message: "All deliveries processed instantly" });
+  } catch (err) {
+    console.error("Instant delivery failed:", err.message);
+    res
+      .status(500)
+      .json({ error: "Something went wrong during instant delivery" });
+  }
 });
 
 // POST /delivery-receipt

@@ -519,7 +519,7 @@ function SegmentCampaign() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: segName,
-          createdBy: userData?.email,
+          createdBy: userData?.emails?.[0]?.value,
           rules: querySeg,
         }),
       })
