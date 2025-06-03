@@ -16,6 +16,7 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
+import { createTheme, styled } from "@mui/material/styles";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SegmentIcon from "@mui/icons-material/Segment";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
@@ -58,6 +59,10 @@ const getNavigation = (user) => [
 ];
 
 
+const demoTheme =
+  createTheme();
+
+
 function Dashboard() {
   const API_BASE = import.meta.env.VITE_API_BASE;
   const [isLoggedIn, setIsLoggedIn]=useState(false);
@@ -71,7 +76,7 @@ function Dashboard() {
   setUserData(details.user);
   setIsLoggedIn(details.loggedIn); // ✅ this will now work properly!
   setPhoto(details.user?.photos[0]?.value || "/profile-placeholder.png");
- 
+  
 })
       .catch((err) => console.error(err));
   };
@@ -138,6 +143,7 @@ function Dashboard() {
       <AppProvider
         navigation={getNavigation(userData)}
         router={router}
+        theme={demoTheme}
       >
         <Box
           sx={{
